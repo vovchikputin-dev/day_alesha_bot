@@ -51,7 +51,7 @@ async def alesha(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if len(users) < 1:
         await update.message.reply_text(
-            "🍺 В этом баре пока тихо..."
+            "🍺 В кабаке пока тихо..."
         )
         return
 
