@@ -20,6 +20,13 @@ TITLES = [
     "Сегодня останется трезвым:"
 ]
 
+FUN_LINES = [
+    "ушёл в графин и не вернулся",
+    "официально подозрительно трезв",
+    "опять заказал чебуреки на всех",
+    "говорит, что только по пиву"
+]
+
 
 # сохраняем пользователей ПО ЧАТАМ
 async def track(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -62,12 +69,18 @@ async def alesha(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     c = random.choice(pool) if pool else a
 
-    text = (
-        f"🍺 Бар «Алёша и графин» 🍺\n\n"
-        f"{TITLES[0]} {a}\n"
-        f"{TITLES[1]} {b}\n"
-        f"{TITLES[2]} {c}"
-    )
+ text = (
+    f"🍺 Народный кабак «Алёша и графин» 🍺\n\n"
+
+    f"{shuffled_titles[0]} {selected_users[0]}\n"
+    f"— {random.choice(FUN_LINES)}\n\n"
+
+    f"{shuffled_titles[1]} {selected_users[1]}\n"
+    f"— {random.choice(FUN_LINES)}\n\n"
+
+    f"{shuffled_titles[2]} {selected_users[2]}\n"
+    f"— {random.choice(FUN_LINES)}"
+)
 
     await update.message.reply_text(text)
 
