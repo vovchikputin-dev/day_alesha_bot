@@ -1,7 +1,14 @@
 import os
 import random
+
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler,
+    MessageHandler,
+    ContextTypes,
+    filters
+)
 
 from db import init_db, add_user, get_users
 
@@ -13,36 +20,47 @@ TITLES = [
     "Сегодня останется трезвым:"
 ]
 
-# сохраняем всех кто пишет
+
+# сохраняем пользователей ПО ЧАТАМ
 async def track(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    if user:
+    chat = update.effective_chat
+
+    if user and chat:
         name = user.first_name or "Неизвестный"
-        add_user(user.id, name)
+
+        add_user(
+            chat.id,
+            user.id,
+            name
+        )
 
 
+# команда /alesha
 async def alesha(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    users = get_users()
+    chat = update.effective_chat
+
+    users = get_users(chat.id)
 
     if len(users) < 1:
-        await update.message.reply_text("В баре пока тишина... напишите что-нибудь 🍻")
+        await update.message.reply_text(
+            "🍺 В этом баре пока тихо..."
+        )
         return
 
-    # выбираем без повторов в одной выдаче
     pool = users.copy()
 
     a = random.choice(pool)
-    pool.remove(a)
+
+    if a in pool:
+        pool.remove(a)
 
     b = random.choice(pool) if pool else a
 
-    pool = users.copy()
-    if a in pool:
-        pool.remove(a)
     if b in pool:
         pool.remove(b)
 
-    c = random.choice(pool) if pool else random.choice(users)
+    c = random.choice(pool) if pool else a
 
     text = (
         f"🍺 Бар «Алёша и графин» 🍺\n\n"
@@ -59,8 +77,17 @@ if __name__ == "__main__":
 
     app = ApplicationBuilder().token(TOKEN).build()
 
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, track))
-    app.add_handler(CommandHandler("alesha", alesha))
+    app.add_handler(
+        MessageHandler(
+            filters.TEXT & ~filters.COMMAND,
+            track
+        )
+    )
+
+    app.add_handler(
+        CommandHandler("alesha", alesha)
+    )
 
     print("Bot started")
+
     app.run_polling()
